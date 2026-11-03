@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+
+  # Migrations + pgTAP contra um Postgres local descartável (roda em paralelo ao check).
+  db-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase start -x studio,imgproxy,inbucket,edge-runtime,realtime,storage-api,vector,logflare
+      - run: supabase test db
+
+  # Aplica as migrations em produção. Só roda depois do gate e quando o projeto estiver configurado
+  # (variável de repositório SUPABASE_PROJECT_REF + segredos SUPABASE_ACCESS_TOKEN e SUPABASE_DB_PASSWORD).
+  migrate:
+    needs: [check, db-test]
+    if: github.ref == 'refs/heads/main' && vars.SUPABASE_PROJECT_REF != ''
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase link --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
+      - run: supabase db push
