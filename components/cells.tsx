@@ -5,8 +5,14 @@ import { addCheckpoint, addRow, deleteRow, updateRow } from "@/app/actions";
 import { formatBRL, parseBRL } from "@/lib/format";
 import type { Category, Status } from "@/lib/types";
 
+// No celular os campos têm fundo visível (não há hover para revelar que são editáveis);
+// 16px evita o zoom automático do iOS ao focar.
 const input =
-  "w-full rounded-md border border-transparent bg-transparent px-2 py-2 text-base hover:border-zinc-300 md:py-1.5 md:text-sm focus:border-emerald-500 focus:bg-white focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-900";
+  "w-full min-w-0 rounded-md border border-transparent bg-transparent px-2 py-1.5 text-sm hover:border-zinc-300 focus:border-emerald-500 focus:bg-white focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-900 max-md:border-zinc-200 max-md:bg-zinc-50 max-md:py-2 max-md:text-base dark:max-md:border-zinc-800 dark:max-md:bg-zinc-900";
+
+// Campos dentro do cartão de pit-stop: sem fundo próprio, mais justos.
+const compactInput =
+  "w-full min-w-0 rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-zinc-300 focus:border-emerald-500 focus:bg-white focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-900";
 
 export function TextCell({
   table, id, field, value, placeholder,
@@ -17,6 +23,7 @@ export function TextCell({
       key={value}
       defaultValue={value}
       placeholder={placeholder}
+      aria-label={placeholder}
       disabled={pending}
       className={input}
       onBlur={(e) => {
@@ -28,16 +35,21 @@ export function TextCell({
 }
 
 export function MoneyCell({
-  table, id, field = "amount", value,
-}: { table: string; id: string; field?: string; value: number }) {
+  table, id, field = "amount", value, compact = false,
+}: { table: string; id: string; field?: string; value: number; compact?: boolean }) {
   const [pending, start] = useTransition();
   return (
     <input
       key={value}
       defaultValue={formatBRL(value)}
       inputMode="decimal"
+      aria-label="Valor"
       disabled={pending}
-      className={`${input} text-right tabular-nums`}
+      className={
+        compact
+          ? `${compactInput} text-base font-medium tabular-nums md:text-sm`
+          : `${input} text-right tabular-nums max-md:text-left max-md:font-medium`
+      }
       onFocus={(e) => e.target.select()}
       onBlur={(e) => {
         const v = parseBRL(e.target.value);
@@ -56,8 +68,9 @@ export function DateCell({ id, value }: { id: string; value: string }) {
       type="date"
       key={value}
       defaultValue={value}
+      aria-label="Data do pit-stop"
       disabled={pending}
-      className={`${input} w-[8.5rem]`}
+      className={`${compactInput} text-xs text-zinc-500 [&::-webkit-calendar-picker-indicator]:ml-0.5 [&::-webkit-calendar-picker-indicator]:size-3 [&::-webkit-calendar-picker-indicator]:opacity-50`}
       onChange={(e) => {
         if (e.target.value && e.target.value !== value) {
           start(() => updateRow("card_checkpoints", id, { date: e.target.value }));
@@ -109,6 +122,7 @@ export function CategoryCell({
   return (
     <select
       value={value ?? ""}
+      aria-label="Categoria"
       disabled={pending}
       className={input}
       onChange={(e) =>
@@ -123,14 +137,18 @@ export function CategoryCell({
   );
 }
 
-export function DeleteButton({ table, id, confirmText }: { table: string; id: string; confirmText?: string }) {
+export function DeleteButton({
+  table, id, confirmText, small = false,
+}: { table: string; id: string; confirmText?: string; small?: boolean }) {
   const [pending, start] = useTransition();
   return (
     <button
       disabled={pending}
       aria-label="Remover"
       title="Remover"
-      className="rounded-md px-3 py-2 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+      className={`rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 ${
+        small ? "px-1.5 py-0.5 text-xs" : "px-2.5 py-1.5"
+      }`}
       onClick={() => {
         if (confirmText && !confirm(confirmText)) return;
         start(() => deleteRow(table, id));
@@ -162,7 +180,7 @@ export function AddCheckpointButton({ cardId }: { cardId: string }) {
     <button
       disabled={pending}
       onClick={() => start(() => addCheckpoint(cardId))}
-      className="whitespace-nowrap rounded-md border border-dashed border-zinc-300 px-3 py-1.5 text-xs text-zinc-600 hover:border-emerald-500 hover:text-emerald-700 dark:border-zinc-700 dark:text-zinc-400"
+      className="self-stretch whitespace-nowrap rounded-md border border-dashed border-zinc-300 px-3 py-1.5 text-xs text-zinc-600 hover:border-emerald-500 hover:text-emerald-700 dark:border-zinc-700 dark:text-zinc-400"
     >
       + Pit-stop
     </button>

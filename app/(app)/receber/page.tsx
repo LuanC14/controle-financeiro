@@ -1,5 +1,8 @@
 import { AddButton, DeleteButton, MoneyCell, PersistCell, StatusCell, TextCell } from "@/components/cells";
-import { emptyRow, footRow, row, table, tableWrap, tbody, tfoot, thead } from "@/components/table-styles";
+import {
+  areasSimple, cellAmount, cellDel, cellDesc, cellFixo, cellStatus, colAmount, colDel, colFixo,
+  colStatus, emptyRow, footRow, row, table, tableWrap, tbody, tfoot, thead,
+} from "@/components/table-styles";
 import { getIncome } from "@/lib/data";
 import { formatBRL } from "@/lib/format";
 
@@ -19,10 +22,10 @@ export default async function ReceberPage() {
           <thead className={thead}>
             <tr>
               <th className="px-3 py-2">Descrição</th>
-              <th className="px-3 py-2 text-right">Valor</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2 text-center" title="Manter no próximo mês">Fixo</th>
-              <th className="w-10" />
+              <th className={`${colAmount} px-3 py-2 text-right`}>Valor</th>
+              <th className={`${colStatus} px-3 py-2`}>Status</th>
+              <th className={`${colFixo} px-3 py-2 text-center`} title="Manter no próximo mês">Fixo</th>
+              <th className={colDel} />
             </tr>
           </thead>
           <tbody className={tbody}>
@@ -34,21 +37,21 @@ export default async function ReceberPage() {
               </tr>
             )}
             {income.map((i) => (
-              <tr key={i.id} className={row}>
-                <td className="px-1 py-1 max-md:order-1 max-md:min-w-0 max-md:flex-1">
+              <tr key={i.id} className={`${row} ${areasSimple}`}>
+                <td className={cellDesc}>
                   <TextCell table="income_items" id={i.id} field="description" value={i.description} placeholder="Descrição" />
                 </td>
-                <td className="px-1 py-1 max-md:order-3 max-md:w-40">
+                <td className={cellAmount}>
                   <MoneyCell table="income_items" id={i.id} value={i.amount} />
                 </td>
-                <td className="px-3 py-1 max-md:order-4 max-md:px-1">
+                <td className={cellStatus}>
                   <StatusCell table="income_items" id={i.id} value={i.status} doneLabel="Recebido" />
                 </td>
-                <td className="px-3 py-1 text-center max-md:order-5 max-md:flex max-md:items-center max-md:gap-1 max-md:px-1 max-md:text-xs max-md:text-zinc-500">
+                <td className={cellFixo}>
                   <PersistCell table="income_items" id={i.id} value={i.persist} />
                   <span className="md:hidden">Fixo</span>
                 </td>
-                <td className="px-1 py-1 max-md:order-2"><DeleteButton table="income_items" id={i.id} /></td>
+                <td className={cellDel}><DeleteButton table="income_items" id={i.id} /></td>
               </tr>
             ))}
           </tbody>
