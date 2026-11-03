@@ -14,6 +14,9 @@ const TABLES = [
 ] as const;
 type Table = (typeof TABLES)[number];
 
+const SIGNUP_CLOSED_MESSAGE =
+  "O limite de contas deste app foi atingido. Entre com uma conta existente.";
+
 function assertTable(table: string): asserts table is Table {
   if (!(TABLES as readonly string[]).includes(table)) {
     throw new Error("Tabela inválida");
@@ -92,13 +95,22 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
+  // O trigger do banco é a trava real; aqui só damos uma mensagem clara.
+  const { data: open } = await supabase.rpc("signup_open");
+  if (open === false) {
+    redirect(`/login?erro=${encodeURIComponent(SIGNUP_CLOSED_MESSAGE)}`);
+  }
   const { data, error } = await supabase.auth.signUp({
     email: String(formData.get("email")),
     password: String(formData.get("password")),
   });
-  if (error) redirect(`/login?erro=${encodeURIComponent(error.message)}`);
+  if (error) {
+    // Corrida entre dois cadastros: o trigger recusou, mas a API devolve um erro genérico.
+    const closed = error.message.toLowerCase().includes("database error");
+    redirect(`/login?erro=${encodeURIComponent(closed ? SIGNUP_CLOSED_MESSAGE : error.message)}`);
+  }
   if (!data.session) {
-    redirect(`/login?info=${encodeURIComponent("Conta criada. Confirme o e-mail e entre.")}`);
+    redirect(`/login?info=${encodeURIComponent("Conta criada. Agora é só entrar.")}`);
   }
   redirect("/receber");
 }

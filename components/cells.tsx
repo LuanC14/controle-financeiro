@@ -6,7 +6,7 @@ import { formatBRL, parseBRL } from "@/lib/format";
 import type { Category, Status } from "@/lib/types";
 
 const input =
-  "w-full rounded-md border border-transparent bg-transparent px-2 py-1.5 text-sm hover:border-zinc-300 focus:border-emerald-500 focus:bg-white focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-900";
+  "w-full rounded-md border border-transparent bg-transparent px-2 py-2 text-base hover:border-zinc-300 md:py-1.5 md:text-sm focus:border-emerald-500 focus:bg-white focus:outline-none dark:hover:border-zinc-700 dark:focus:bg-zinc-900";
 
 export function TextCell({
   table, id, field, value, placeholder,
@@ -76,7 +76,7 @@ export function StatusCell({
     <button
       disabled={pending}
       onClick={() => start(() => updateRow(table, id, { status: done ? "pending" : "done" }))}
-      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+      className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
         done
           ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
           : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
@@ -96,7 +96,7 @@ export function PersistCell({ table, id, value }: { table: string; id: string; v
       disabled={pending}
       title="Manter esta linha no próximo mês"
       aria-label="Manter no próximo mês"
-      className="size-4 accent-emerald-600"
+      className="size-5 accent-emerald-600 md:size-4"
       onChange={(e) => start(() => updateRow(table, id, { persist: e.target.checked }))}
     />
   );
@@ -130,7 +130,7 @@ export function DeleteButton({ table, id, confirmText }: { table: string; id: st
       disabled={pending}
       aria-label="Remover"
       title="Remover"
-      className="rounded-md px-2 py-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+      className="rounded-md px-3 py-2 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
       onClick={() => {
         if (confirmText && !confirm(confirmText)) return;
         start(() => deleteRow(table, id));
@@ -182,7 +182,7 @@ export function AddCategoryForm() {
       <input
         name="name"
         placeholder="Nova categoria"
-        className="rounded-md border border-zinc-300 bg-transparent px-2 py-1.5 text-sm dark:border-zinc-700"
+        className="rounded-md border border-zinc-300 bg-transparent px-2 py-2 text-base md:py-1.5 md:text-sm dark:border-zinc-700"
       />
       <button disabled={pending} className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm text-white dark:bg-zinc-100 dark:text-zinc-900">
         Adicionar

@@ -10,7 +10,7 @@ export default async function LoginPage({
     !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   const field =
-    "w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm dark:border-zinc-700";
+    "w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2.5 text-base md:text-sm dark:border-zinc-700";
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-16">

@@ -25,6 +25,14 @@ Isolamento entre usuários na API real: `npm run rls:check`.
 Crie um projeto no Supabase, rode `supabase link` + `supabase db push` (ou deixe o job `migrate` do CI fazer isso) e publique na Vercel
 com as duas variáveis `NEXT_PUBLIC_*`. Detalhes em `AGENTS.md` (seção Go-live).
 
+## PWA e mobile
+
+O app é instalável (manifesto em `app/manifest.ts`, ícones em `public/icons`, gerados por `node scripts/generate-icons.mjs`). No celular, a navegação fica numa barra inferior e as tabelas viram cartões. O service worker só serve a página offline: nenhum dado é guardado em cache.
+
+## Contas
+
+O cadastro não exige confirmação de e-mail e é limitado a **10 contas** (trigger no banco; veja `supabase/migrations/20261104000001_account_limit.sql`).
+
 ## Como funciona
 
 - **Resultado** = total a receber − (gastos gerais + último pit-stop de cada cartão). É um valor previsto/estimado; o status Pendente/Recebido/Pago é só controle visual.

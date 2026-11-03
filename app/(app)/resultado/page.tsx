@@ -63,7 +63,7 @@ export default async function ResultadoPage({
               name="reference"
               required
               defaultValue={currentReference()}
-              className="rounded-md border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+              className="rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-base md:text-sm dark:border-zinc-700"
             />
           </label>
           <button className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
