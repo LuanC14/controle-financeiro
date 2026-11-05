@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { addCheckpoint, addRow, deleteRow, updateRow } from "@/app/actions";
+import { addRow, deleteRow, updateRow } from "@/app/actions";
 import { formatBRL, parseBRL } from "@/lib/format";
 import type { Category, Status } from "@/lib/types";
 
@@ -170,19 +170,6 @@ export function AddButton({
       className="rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-600 hover:border-emerald-500 hover:text-emerald-700 dark:border-zinc-700 dark:text-zinc-400"
     >
       + {label}
-    </button>
-  );
-}
-
-export function AddCheckpointButton({ cardId }: { cardId: string }) {
-  const [pending, start] = useTransition();
-  return (
-    <button
-      disabled={pending}
-      onClick={() => start(() => addCheckpoint(cardId))}
-      className="self-stretch whitespace-nowrap rounded-md border border-dashed border-zinc-300 px-3 py-1.5 text-xs text-zinc-600 hover:border-emerald-500 hover:text-emerald-700 dark:border-zinc-700 dark:text-zinc-400"
-    >
-      + Pit-stop
     </button>
   );
 }

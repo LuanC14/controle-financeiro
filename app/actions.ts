@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { type CheckpointMode, nextCheckpointAmount } from "@/lib/checkpoint";
 import { closeMonthErrorMessage } from "@/lib/close-month";
 import { createClient } from "@/lib/supabase/server";
 
@@ -52,7 +53,8 @@ export async function deleteRow(table: string, id: string) {
 }
 
 /** Novo pit-stop: repete o valor do anterior como ponto de partida. */
-export async function addCheckpoint(cardId: string) {
+// O valor é recalculado aqui a partir do último pit-stop gravado, não do que a tela mostrava.
+export async function addCheckpoint(cardId: string, mode: CheckpointMode, values: number[]) {
   const supabase = await createClient();
   const { data: last } = await supabase
     .from("card_checkpoints")
@@ -62,10 +64,11 @@ export async function addCheckpoint(cardId: string) {
     .limit(1)
     .maybeSingle();
 
+  const amount = nextCheckpointAmount(Number(last?.amount ?? 0), mode, values);
   const { error } = await supabase.from("card_checkpoints").insert({
     card_id: cardId,
     seq: (last?.seq ?? 0) + 1,
-    amount: last?.amount ?? 0,
+    amount,
   });
   if (error) throw new Error(error.message);
   refresh();

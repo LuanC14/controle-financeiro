@@ -1,8 +1,9 @@
 import Link from "next/link";
 import {
-  AddButton, AddCategoryForm, AddCheckpointButton, CategoryCell, DateCell,
+  AddButton, AddCategoryForm, CategoryCell, DateCell,
   DeleteButton, MoneyCell, PersistCell, StatusCell, TextCell,
 } from "@/components/cells";
+import { AddCheckpointButton } from "@/components/checkpoint-dialog";
 import {
   areasCard, areasWithCategory, cellAmount, cellCat, cellDel, cellDesc, cellFixo, cellStatus,
   cellStops, colAmount, colDel, colFixo, colStatus, emptyRow, footRow, row, table, tableWrap,
@@ -184,7 +185,7 @@ async function Cartoes() {
                         </div>
                       );
                     })}
-                    <AddCheckpointButton cardId={c.id} />
+                    <AddCheckpointButton cardId={c.id} cardName={c.name} current={lastCheckpointAmount(c)} />
                   </div>
                 </td>
                 <td className={`${cellAmount} text-right font-medium tabular-nums max-md:text-left`}>
